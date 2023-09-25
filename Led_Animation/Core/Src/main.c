@@ -62,6 +62,7 @@ void clearAllClock();
 struct time initTime(int hour, int minute, int second);
 void displayTime(struct time input);
 
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -101,23 +102,32 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start_IT(&htim2);
+  //HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  struct time display_time = initTime(1, 59, 59);
-
+  struct time tmp = initTime(1, 0, 0);
+  displayTime(tmp);
+  set_Timer1(60 - tmp.second);
   while (1)
   {
-    /* USER CODE END WHILE */
-	 displayTime(display_time);
-	 HAL_Delay(2000);
-	 clearNumberOnClock(1);
-	 HAL_Delay(2000);
-	 clearAllClock();
-	 HAL_Delay(2000);
-
+	clearAllClock();
+	tmp.second++;// = get_timer1_counter();
+	displayTime(tmp);
+	HAL_Delay(10);
+	if(tmp.second == 60){
+		//clearAllClock();
+		//tmp.second = get_timer1_counter();
+		//displayTime(tmp);
+		tmp.minute++;
+		if(tmp.minute>=60){
+			tmp.hour++;
+			tmp.minute = 0;
+		}
+		//set_Timer1(0);
+		tmp.second = 0;
+	}
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -234,6 +244,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	timerRun();
 }
